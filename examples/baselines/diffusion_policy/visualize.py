@@ -24,6 +24,8 @@ class VisualizeArgs():
     initial_state_path: Optional[str] = None
     """Path to a .npy file containing the desired initial qpos array for the environment.
        If set along with --use-fixed-start-pose, this qpos will be used for reset."""
+    no_video: bool = False
+    """Controls whether to record videos"""
     seed: int = 42  # overrides TrainArgs.seed for eval
     """Seed to use"""
     eval_seed: Optional[int] = None
@@ -51,7 +53,7 @@ def visualize(args: VisualizeArgs, checkpoint_path: str, num_episodes: int, outp
     """
 
     # --- Setup ---
-    args.num_eval_envs = min(num_episodes, 10) # Limit parallel envs for smoother video recording if needed
+    args.num_eval_envs = min(num_episodes, 10, args.num_eval_envs) # Limit parallel envs for smoother video recording if needed
 
     print("Using arguments:")
     print(f"  checkpoint_path: {checkpoint_path}")
@@ -122,7 +124,7 @@ def visualize(args: VisualizeArgs, checkpoint_path: str, num_episodes: int, outp
         control_mode="pd_ee_delta_pose",
         reward_mode="sparse", # Reward mode doesn't matter much for visualization
         obs_mode="state",
-        render_mode="rgb_array", # Crucial for video recording
+        render_mode="rgb_array" if not args.no_video else "none", # Crucial for video recording
         human_render_camera_configs=dict(shader_pack="default") # Optional: nice rendering
     )
     if args.max_episode_steps is not None:
@@ -142,7 +144,7 @@ def visualize(args: VisualizeArgs, checkpoint_path: str, num_episodes: int, outp
         "physx_cuda",
         env_kwargs,
         other_kwargs,
-        video_dir=video_dir
+        video_dir=video_dir if not args.no_video else None
     )
     print(f"Created {args.num_eval_envs} evaluation environments.")
 
