@@ -1,0 +1,3 @@
+[submodule "examples/baselines/diffusion_policy/V-GPS"]
+	path = examples/baselines/diffusion_policy/V-GPS
+	url = https://github.com/Blizzard42/V-GPS.git
